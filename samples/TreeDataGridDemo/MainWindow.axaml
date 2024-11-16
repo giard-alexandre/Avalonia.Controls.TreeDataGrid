@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="using:TreeDataGridDemo.Models"
         xmlns:vm="using:TreeDataGridDemo.ViewModels"
+        xmlns:treeDataGridDemo="clr-namespace:TreeDataGridDemo"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TreeDataGridDemo.MainWindow"
         Title="TreeDataGridDemo">
@@ -141,6 +142,9 @@
                       RowDragStarted="DragDrop_RowDragStarted"
                       RowDragOver="DragDrop_RowDragOver"/>
       </DockPanel>
+    </TabItem>
+    <TabItem Header="String Convert Sample">
+      <treeDataGridDemo:StringConvertView DataContext="{Binding }"/>
     </TabItem>
   </TabControl>
 </Window>

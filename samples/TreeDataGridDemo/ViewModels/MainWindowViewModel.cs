@@ -6,6 +6,8 @@
         private FilesPageViewModel? _files;
         private WikipediaPageViewModel? _wikipedia;
         private DragDropPageViewModel? _dragDrop;
+        private StringConvertViewModel? _stringConvert;
+
 
         public CountriesPageViewModel Countries
         {
@@ -25,6 +27,11 @@
         public DragDropPageViewModel DragDrop
         {
             get => _dragDrop ??= new DragDropPageViewModel();
+        }
+
+        public StringConvertViewModel StringConvertVm
+        {
+            get => _stringConvert ??= new StringConvertViewModel();
         }
     }
 }
