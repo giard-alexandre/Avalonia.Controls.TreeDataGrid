@@ -144,7 +144,7 @@
       </DockPanel>
     </TabItem>
     <TabItem Header="String Convert Sample">
-      <treeDataGridDemo:StringConvertView DataContext="{Binding }"/>
+      <treeDataGridDemo:StringConvertView DataContext="{Binding StringConvertVm}"/>
     </TabItem>
   </TabControl>
 </Window>

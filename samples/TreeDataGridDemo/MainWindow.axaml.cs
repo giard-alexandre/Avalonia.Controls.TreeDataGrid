@@ -121,8 +121,9 @@ namespace TreeDataGridDemo
             }
             var treeDataGrid = (TreeDataGrid?)((Control)tabItem.Content!).GetLogicalDescendants()
                 .First(x => x is TreeDataGrid tl);
-            var textBlock = (TextBlock)((Control)tabItem.Content!).GetLogicalDescendants()
-                .First(x => x is TextBlock tb && tb.Classes.Contains("realized-count"));
+            var textBlock = (TextBlock?)((Control)tabItem.Content!).GetLogicalDescendants()
+                .FirstOrDefault(x => x is TextBlock tb && tb.Classes.Contains("realized-count"));
+            if (textBlock is null) return;
             var rows = treeDataGrid!.RowsPresenter!;
             var realizedRowCount = rows.GetRealizedElements().Count();
             var unrealizedRowCount = rows.GetVisualChildren().Count() - realizedRowCount;

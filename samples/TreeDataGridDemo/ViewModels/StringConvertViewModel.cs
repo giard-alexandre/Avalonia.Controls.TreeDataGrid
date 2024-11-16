@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Linq;
 
 using Avalonia.Controls;
@@ -13,22 +14,42 @@ using DynamicData;
 using DynamicData.Binding;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace TreeDataGridDemo.ViewModels
 {
-    public class StringConvertViewModel : ReactiveObject {
+    public class StringConvertViewModel : ReactiveObject
+    {
+        private SourceCache<Person, int> _source = new(p => p.Id);
     private string? _filterText;
 
+    public ReactiveCommand<Unit, Unit> ChangeNameCommand { get; set; }
+
     public StringConvertViewModel() {
-        var data = new ObservableCollection<Person>(GenerateFakes(3000)).ToObservableChangeSet(person => person.Id);
+        ChangeNameCommand = ReactiveCommand.Create(() =>
+        {
+            var fifth = _source.Lookup(5);
+            if (fifth.HasValue)
+            {
+                fifth.Value.IsChecked = !fifth.Value.IsChecked;
+                fifth.Value.DateOfBirth += TimeSpan.FromDays(5);
+                fifth.Value.Guid = new Guid();
+
+                _source.AddOrUpdate(fifth.Value);
+            }
+        });
+        _source.AddOrUpdate(GenerateFakes(3000));
 
         var searchFilter = this.WhenValueChanged(t => t.FilterText)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Select(BuildSearchFilter);
 
-        var filteredData = data.Filter(searchFilter);
+        var filteredData = _source.Connect().Filter(searchFilter);
 
-        filteredData.Bind(out var items);
+        filteredData
+            .Do(x => Console.WriteLine("Tick"))
+            .Bind(out var items)
+            .Subscribe();
         
         
 
@@ -36,6 +57,7 @@ namespace TreeDataGridDemo.ViewModels
             new FlatTreeDataGridSource<Person>(items) {
                 Columns = {
                     new TextColumn<Person, int>("Id", person => person.Id),
+                    new TextColumn<Person, Guid>("Guid", person => person.Guid),
                     new TextColumn<Person, string>("FirstName", person => person.FirstName),
                     new TextColumn<Person, string>("LastName", person => person.LastName),
                     new TextColumn<Person, DateTime>("DoB", person => person.DateOfBirth),
@@ -99,6 +121,7 @@ namespace TreeDataGridDemo.ViewModels
         //Set the randomizer seed to generate repeatable data sets.
         Randomizer.Seed = new Random(8675309);
         var faker = new Faker<Person>().RuleFor(p => p.Id, faker => faker.IndexFaker)
+            .RuleFor(p => p.Guid, faker => faker.Random.Guid())
             .RuleFor(p => p.DateOfBirth, faker => faker.Date.Past(80))
             .RuleFor(p => p.Height, faker => faker.Random.Double())
             .RuleFor(p => p.Gender, faker => faker.Person.Gender)
@@ -127,25 +150,26 @@ namespace TreeDataGridDemo.ViewModels
     }
 }
 
-public record Person {
-    public int Id { get; set; }
-    public DateTime DateOfBirth { get; set; }
-    public double Height { get; set; }
-    public Name.Gender Gender { get; set; }
-    public decimal Money { get; set; }
-    public bool IsChecked { get; set; }
-    public string FirstName { get; set; } = "";
-    public string LastName { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string PhoneNumber { get; set; } = "";
-    public string Address { get; set; } = "";
-    public string City { get; set; } = "";
-    public string State { get; set; } = "";
-    public string PostalCode { get; set; } = "";
-    public string Country { get; set; } = "";
-    public bool IsMarried { get; set; }
-    public DateTime? WeddingAnniversary { get; set; }
-    public List<string> Hobbies { get; set; } = new();
-    public List<string> LanguagesSpoken { get; set; } = new();
+public class Person : ReactiveObject {
+    [Reactive] public int Id { get; set; }
+    [Reactive] public Guid Guid { get; set; }
+    [Reactive] public DateTime DateOfBirth { get; set; }
+    [Reactive] public double Height { get; set; }
+    [Reactive] public Name.Gender Gender { get; set; }
+    [Reactive] public decimal Money { get; set; }
+    [Reactive] public bool IsChecked { get; set; }
+    [Reactive] public string FirstName { get; set; } = "";
+    [Reactive] public string LastName { get; set; } = "";
+    [Reactive] public string Email { get; set; } = "";
+    [Reactive] public string PhoneNumber { get; set; } = "";
+    [Reactive] public string Address { get; set; } = "";
+    [Reactive] public string City { get; set; } = "";
+    [Reactive] public string State { get; set; } = "";
+    [Reactive] public string PostalCode { get; set; } = "";
+    [Reactive] public string Country { get; set; } = "";
+    [Reactive] public bool IsMarried { get; set; }
+    [Reactive] public DateTime? WeddingAnniversary { get; set; }
+    [Reactive] public List<string> Hobbies { get; set; } = new();
+    [Reactive] public List<string> LanguagesSpoken { get; set; } = new();
 }
 }
