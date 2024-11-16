@@ -33,6 +33,10 @@ namespace TreeDataGridDemo.ViewModels
             {
                 fifth.Value.IsChecked = !fifth.Value.IsChecked;
                 fifth.Value.DateOfBirth += TimeSpan.FromDays(5);
+
+                // When the Guid is updated, it causes the app to crash due to an invalid cast exception.
+                // This happens whether we do a full update, like here, or a Refresh, or just an update
+                // to a property on a class that implements INotifyPropertyChanged.
                 fifth.Value.Guid = new Guid();
 
                 _source.AddOrUpdate(fifth.Value);
